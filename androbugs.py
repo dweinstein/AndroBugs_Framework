@@ -3581,16 +3581,9 @@ def main() :
         __analyze(writer, args)
 
         analyze_signature = get_hash_scanning(writer)
-        #writer.writeInf_ForceNoPrint("signature_unique_analyze", analyze_signature)    #For uniquely distinguish the analysis report
+        writer.writeInf_ForceNoPrint("signature_unique_analyze", analyze_signature)    #For uniquely distinguish the analysis report
         #writer.append_to_file_io_information_output_list("Analyze Signature: " + analyze_signature)
         #writer.append_to_file_io_information_output_list("------------------------------------------------------------------------------------------------")
-        inf = writer.getInf()
-        packed = writer.get_packed_analyzed_results_for_mongodb()
-        import serialize
-        import json
-        print(json.dumps(packed, default=serialize.json_serial))
-        return
-
     except ExpectedException as err_expected :
 
         writer.update_analyze_status("fail")
@@ -3644,19 +3637,25 @@ def main() :
             traceback.print_exc()
 
     #Save to the DB
-    if args.store_analysis_result_in_db :
-        __persist_db(writer, args)
+    #if args.store_analysis_result_in_db :
+    #    __persist_db(writer, args)
 
 
-    if writer.get_analyze_status() == "success" :
 
-        if REPORT_OUTPUT == TYPE_REPORT_OUTPUT_ONLY_PRINT :
-            writer.show(args)
-        elif REPORT_OUTPUT == TYPE_REPORT_OUTPUT_ONLY_FILE :
-            __persist_file(writer, args)    #write report to "disk"
-        elif REPORT_OUTPUT == TYPE_REPORT_OUTPUT_PRINT_AND_FILE :
-            writer.show(args)
-            __persist_file(writer, args)    #write report to "disk"
+    packed = writer.get_packed_analyzed_results_for_mongodb()
+    import serialize
+    import json
+    print(json.dumps(packed, default=serialize.json_serial))
+
+    #if writer.get_analyze_status() == "success" :
+
+    #    if REPORT_OUTPUT == TYPE_REPORT_OUTPUT_ONLY_PRINT :
+    #        writer.show(args)
+    #    elif REPORT_OUTPUT == TYPE_REPORT_OUTPUT_ONLY_FILE :
+    #        __persist_file(writer, args)    #write report to "disk"
+    #    elif REPORT_OUTPUT == TYPE_REPORT_OUTPUT_PRINT_AND_FILE :
+    #        writer.show(args)
+    #        __persist_file(writer, args)    #write report to "disk"
 
 
 if __name__ == "__main__":
