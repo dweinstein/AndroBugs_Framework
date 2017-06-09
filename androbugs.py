@@ -249,7 +249,7 @@ class Writer :
 
     #Output: stoping
 
-    def startWriter(self, tag, level, summary, title_msg, special_tag=None, cve_number="") :    
+    def startWriter(self, tag, level, summary, title_msg, special_tag=None, cve_number=""):
         """
             "tag" is for internal usage
             "level, summary, title_msg, special_tag, cve_number" will be shown to the users
@@ -1227,7 +1227,7 @@ def __analyze(writer, args) :
 
 
     if allurls_strip_non_duplicated_final_prerun_count != 0:
-        writer.startWriter("SSL_URLS_NOT_IN_HTTPS", LEVEL_CRITICAL, "SSL Connection Checking", "URLs that are NOT under SSL (Total:" + str(allurls_strip_non_duplicated_final_prerun_count) + "):", ["SSL_Security"])
+        writer.startWriter("SSL_URLS_NOT_IN_HTTPS", LEVEL_CRITICAL, "SSL Connection Checking", "URLs that are NOT using SSL (Total:" + str(allurls_strip_non_duplicated_final_prerun_count) + "):", ["SSL_Security"])
         
         for url in allurls_strip_non_duplicated_final :
 
@@ -1249,7 +1249,7 @@ def __analyze(writer, args) :
                 pass
 
     else:
-        writer.startWriter("SSL_URLS_NOT_IN_HTTPS", LEVEL_INFO, "SSL Connection Checking", "Did not discover urls that are not under SSL (Notice: if you encrypt the url string, we can not discover that).", ["SSL_Security"])
+        writer.startWriter("SSL_URLS_NOT_IN_HTTPS", LEVEL_INFO, "SSL Connection Checking", "Did not discover urls that are not under SSL (Notice: static analysis can't detect encrypted URL strings).", ["SSL_Security"])
         
     #--------------------------------------------------------------------
     
@@ -1274,11 +1274,11 @@ def __analyze(writer, args) :
                         list_security_related_methods.append(method)
 
         if list_security_related_methods :
-            writer.startWriter("Security_Methods", LEVEL_NOTICE, "Security Methods Checking", "Find some security-related method names:")
+            writer.startWriter("Security_Methods", LEVEL_NOTICE, "Security Methods Checking", "Found some security-related method names:")
             for method in list_security_related_methods :
                 writer.write(method.get_class_name() + "->" + method.get_name() + method.get_descriptor())
         else :
-            writer.startWriter("Security_Methods", LEVEL_INFO, "Security Methods Checking", "Did not detect method names containing security related string.")
+            writer.startWriter("Security_Methods", LEVEL_INFO, "Security Methods Checking", "Did not detect method names containing a security related string.")
             
 
     #------------------------------------------------------------------------------------------------------
@@ -1294,12 +1294,12 @@ def __analyze(writer, args) :
                     list_security_related_classes.append(current_class)
 
         if list_security_related_classes :
-            writer.startWriter("Security_Classes", LEVEL_NOTICE, "Security Classes Checking", "Find some security-related class names:")
+            writer.startWriter("Security_Classes", LEVEL_NOTICE, "Security Classes Checking", "Found some security-related class names:")
             
             for current_class in list_security_related_classes :
                 writer.write(current_class.get_name())
         else :
-            writer.startWriter("Security_Classes", LEVEL_INFO, "Security Classes Checking", "Did not detect class names containing security related string.")
+            writer.startWriter("Security_Classes", LEVEL_INFO, "Security Classes Checking", "Did not detect class names containing a security related string.")
             
     #------------------------------------------------------------------------------------------------------
 
@@ -1315,9 +1315,9 @@ def __analyze(writer, args) :
         isMasterKeyVulnerability = True
         
     if isMasterKeyVulnerability :
-        writer.startWriter("MASTER_KEY", LEVEL_CRITICAL, "Master Key Type I Vulnerability", "This APK is suffered from Master Key Type I Vulnerability.", None, "CVE-2013-4787")
+        writer.startWriter("MASTER_KEY", LEVEL_CRITICAL, "Master Key Type I Vulnerability", "This APK suffers from Master Key Type I Vulnerability (duplicate classes.dex).", None, "CVE-2013-4787")
     else :
-        writer.startWriter("MASTER_KEY", LEVEL_INFO, "Master Key Type I Vulnerability", "No Master Key Type I Vulnerability in this APK.", None, "CVE-2013-4787")
+        writer.startWriter("MASTER_KEY", LEVEL_INFO, "Master Key Type I Vulnerability", "No Master Key Type I Vulnerability detected in this APK.", None, "CVE-2013-4787")
 
     #------------------------------------------------------------------------------------------------------
     # Certificate checking (Prerequisite: 1.directory name "tmp" available  2.keytool command is available)
@@ -1354,7 +1354,7 @@ def __analyze(writer, args) :
     is_debug_open = a.is_debuggable()   #Check 'android:debuggable'
     if is_debug_open:
         writer.startWriter("DEBUGGABLE", LEVEL_CRITICAL, "Android Debug Mode Checking", 
-            "DEBUG mode is ON(android:debuggable=\"true\") in AndroidManifest.xml. This is very dangerous. The attackers will be able to sniffer the debug messages by Logcat. Please disable the DEBUG mode if it is a released application.", ["Debug"])
+            "DEBUG mode is ON(android:debuggable=\"true\") in AndroidManifest.xml. This is very dangerous. An attacker may be able to sniff the debug messages by Logcat. Please disable the DEBUG mode if it is a released application.", ["Debug"])
 
     else:
         writer.startWriter("DEBUGGABLE", LEVEL_INFO, "Android Debug Mode Checking", "DEBUG mode is OFF(android:debuggable=\"false\") in AndroidManifest.xml.", ["Debug"])
@@ -1439,7 +1439,7 @@ def __analyze(writer, args) :
         for name in permissionNameOfWrongPermissionGroup:
             writer.write("Permission name '%s' sets an empty value in `permissionGroup` attribute." % (name))
     else:
-        writer.startWriter("PERMISSION_GROUP_EMPTY_VALUE", LEVEL_INFO, "AndroidManifest PermissionGroup Checking", "PermissionGroup in permission tag of AndroidManifest sets correctly.")
+        writer.startWriter("PERMISSION_GROUP_EMPTY_VALUE", LEVEL_INFO, "AndroidManifest PermissionGroup Checking", "PermissionGroup in permission tag of AndroidManifest is set correctly.")
 
     #----------------------------------------------------------------------------------
 
@@ -1481,7 +1481,7 @@ def __analyze(writer, args) :
     if isSuggestGCM :
 
         output_string = """Your supporting minSdk is """ + str(int_min_sdk) + """
-You are now allowing minSdk to less than 8. Please check: http://developer.android.com/about/dashboards/index.html
+You are now allowing minSdk to be less than 8. Please check: http://developer.android.com/about/dashboards/index.html
 Google Cloud Messaging (Push Message) service only allows Android SDK >= 8 (Android 2.2). Pleae check: http://developer.android.com/google/gcm/gcm.html
 You may have the change to use GCM in the future, so please set minSdk to at least 9."""
         writer.startWriter("MANIFEST_GCM", LEVEL_NOTICE, "Google Cloud Messaging Suggestion", output_string)
@@ -1525,7 +1525,7 @@ You may have the change to use GCM in the future, so please set minSdk to at lea
 
         else:
             writer.startWriter("USE_PERMISSION_INTERNET", LEVEL_CRITICAL, "Accessing the Internet Checking", 
-                        "This app has some internet accessing codes but does not have 'android.permission.INTERNET' use-permission in AndroidManifest.")
+                        "This app has some internet accessing code, but does not have 'android.permission.INTERNET' use-permission in AndroidManifest. This can happen when importing 3rd party libraries such as ads")
 
         # if pkg_URLConnection:
         #     print("        =>URLConnection:")
@@ -2903,7 +2903,7 @@ Vulnerable ContentProvider Case Example:
 
             writer.startWriter("PERMISSION_PROVIDER_EXPLICIT_EXPORTED", LEVEL_CRITICAL, "AndroidManifest ContentProvider Exported Checking",
                 """Found "exported" ContentProvider, allowing any other app on the device to access it (AndroidManifest.xml). You should modify the attribute to [exported="false"] or set at least "signature" protectionalLevel permission if you don't want to.
-Vulnerable ContentProvider Case Example: 
+Vulnerable ContentProvider Case Example:
   (1)https://www.nowsecure.com/mobile-security/ebay-android-content-provider-injection-vulnerability.html
   (2)http://blog.trustlook.com/2013/10/23/ebay-android-content-provider-information-disclosure-vulnerability/
   (3)http://www.wooyun.org/bugs/wooyun-2010-039169""")
